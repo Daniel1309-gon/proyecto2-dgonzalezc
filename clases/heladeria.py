@@ -1,5 +1,9 @@
-from clases.ingrediente import Ingrediente
+from models.model_ingrediente import Ingrediente
 from clases.iProducto import iProducto
+from aplicacion import app
+from db import db
+from models.model_producto import Producto
+from sqlalchemy.exc import SQLAlchemyError
 
 class Heladeria:
     def __init__(self):
@@ -7,32 +11,49 @@ class Heladeria:
         self._ingredientes = []
         self._ventas_del_dia = 0
     
-    def producto_mas_rentable(self) -> str:
-        return max(self._productos, key=lambda producto: producto.calcularRentabilidad()).getNombre()
+    def producto_mas_rentable(self):
+        with app.app_context():
+            try:
+                productos = db.session.query(Producto).all()
+                return max(productos, key=lambda producto: producto.calcularRentabilidad()).nombre
+            except:
+                raise SQLAlchemyError('Error en conexion')
     
-    def vender(self, nombre_producto: str) -> bool:
-        producto = next((p for p in self._productos if p.getNombre() == nombre_producto), None)
-        if not producto:
-            return False
-
-        # Verificar inventario
-        for ingrediente in producto.getIngredientes():
-            inventario_ingrediente = next((i for i in self._ingredientes if i.getNombre() == ingrediente.getNombre()), None)
-            if not inventario_ingrediente or inventario_ingrediente.getInventario() < 1:
-                return False
-
-        # Actualizar inventario
-        for ingrediente in producto.getIngredientes():
-            inventario_ingrediente = next(i for i in self._ingredientes if i.getNombre() == ingrediente.getNombre())
-            inventario_ingrediente.actInventario()
-
-        self._ventas_del_dia += 1
-        return True
     
-    def getProductos(self) -> list[iProducto]:
-        return self._productos
+    def vender(self, nombre_producto: str):
+        with app.app_context():
+            try:
+                producto = db.session.query(Producto).filter_by(nombre=nombre_producto).first()
+                if not producto:
+                    raise ValueError('Este producto no existe')
+
+                ingredientes = [producto.ingrediente1, producto.ingrediente2, producto.ingrediente3]
+                
+                for ingrediente in ingredientes:
+                    if ingrediente.inventario < 1:
+                        raise ValueError(f"¡Oh no! Nos hemos quedado sin {ingrediente.nombre}")
+
+                for ingrediente in ingredientes:
+                    ingrediente.inventario -= 1
+                    db.session.add(ingrediente)
+
+                db.session.commit()
+                self._ventas_del_dia += 1
+                return "¡Vendido!"
+            
+            except SQLAlchemyError as e:
+                db.session.rollback()
+                raise e
     
-    def setProductos(self, nuevosProductos: list[iProducto]):
+    def getProductos(self) -> list[Producto]:
+        with app.app_context():
+            try:
+                productos = db.session.query(Producto).all()
+                return productos
+            except:
+                raise SQLAlchemyError('Error en conexion')
+    
+    def setProductos(self, nuevosProductos: list[Producto]):
         self._productos = nuevosProductos
         
     
@@ -47,4 +68,19 @@ class Heladeria:
     
     def setVentasDia(self, nuevasVentas: int):
         self._ventas_del_dia = nuevasVentas
+        
+    def abastecerIngrediente(self, id: int, quantity: int):
+        with app.app_context():
+            try:
+                ingrediente = Ingrediente.query.get(id)
+                if ingrediente is None:
+                    raise ValueError('Ingrediente no encontrado')
+                
+                ingrediente.inventario = quantity
+                db.session.add(ingrediente)
+                db.session.commit()
+                return f'Inventario actualizado.'
+            except Exception as e:
+                db.session.rollback()
+                return e
     

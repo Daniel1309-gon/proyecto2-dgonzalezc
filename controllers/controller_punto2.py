@@ -5,5 +5,5 @@ from db import db
 
 class Controller_punto2(Resource):
     def get(self):
-        return make_response(render_template('index.html', productos = heladeria1.getProductos(), ingredientes = heladeria1.getIngredientes(),ventas = str(heladeria1.getVentasDia()), masRentable = heladeria1.producto_mas_rentable(), vendido = str(heladeria1.vender('Malteada Vainilla'))))
+        return make_response(render_template('index.html', productos = heladeria1.getProductos(), ingredientes = heladeria1.getIngredientes(),ventas = str(heladeria1.getVentasDia()), masRentable = heladeria1.producto_mas_rentable()))
     

@@ -15,6 +15,17 @@ class Producto(db.Model):
     ingrediente2 = db.relationship('Ingrediente', foreign_keys=[id_ingrediente2])
     ingrediente3 = db.relationship('Ingrediente', foreign_keys=[id_ingrediente3])
     
+    
+    def calcularCosto(self) -> float:
+        ingredientes = [self.ingrediente1, self.ingrediente2, self.ingrediente3]
+        return round(sum(ingrediente.getPrecio() for ingrediente in ingredientes),2)
+    
+    def calcularRentabilidad(self) -> float:
+        return self.precio - self.calcularCosto()
+    
+    def getIngredientes(self):
+        return [self.ingrediente1, self.ingrediente2, self.ingrediente3]
+    
 def insertar_producto(tipo: str, nombre: str, precio: float, id1: int, id2: int, id3: int):
     with app.app_context():
         if not id3:

@@ -10,6 +10,17 @@ class Ingrediente(db.Model):
     inventario = db.Column(db.Integer, nullable=False)
     esVegano = db.Column(db.Boolean, nullable=False)
     
+    def getPrecio(self):
+        return self.precio
+    
+    def esSano(self):
+        return self.esVegano or self.calorias < 100
+    
+    def getCalorias(self):
+        return self.calorias
+    
+    
+    
 def insertar_ingrediente(nombre: str, precio: float, calorias: int, inventario: int, esVegano: bool):
     with app.app_context():
         ingrediente = Ingrediente(

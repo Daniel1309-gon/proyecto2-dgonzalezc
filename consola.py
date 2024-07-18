@@ -44,18 +44,21 @@ malteada_vainilla = Malteada(
 heladeria1.setIngredientes([base1, base2, complemento1, helado_fresa, helado_vainilla, chispas_chocolate, mani_japones])
 heladeria1.setProductos([copa1, malteada1, malteada2, copa_fresa, malteada_vainilla])
 
-print(heladeria1.producto_mas_rentable())
+""" print(heladeria1.producto_mas_rentable())
 print(heladeria1.vender('copa '))
 print("Venta de Copa Fresa:", heladeria1.vender("Copa Fresa"))
 print("Venta de Malteada Vainilla:", heladeria1.vender("Malteada Vainilla"))
 print("Venta de Copa Fresa nuevamente:", heladeria1.vender("Copa Fresa"))
 print(heladeria1.getVentasDia())
-print(heladeria1.getIngredientes()[0].getNombre())
+print(heladeria1.getIngredientes()[0].getNombre()) """
 
-insertar_ingrediente('arequioe', 3000, 200, 10, False)
+#insertar_ingrediente('arequioe', 3000, 200, 10, False)
 #insertar_producto('Copa', 'felicidad roja', 9200, 5, 6, 7)
 """ ingrediente = Ingrediente('fresas frescas', 2300, 15, 100, True)
 db.session.add(ingrediente)
 db.session.commit()
  """
 
+""" message = heladeria1.vender('berries')
+print(message) """
+print(heladeria1.getProductos())
